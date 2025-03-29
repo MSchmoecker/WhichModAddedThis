@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <RootNamespace>WhichModAddedThis</RootNamespace>
+    <AssemblyName>WhichModAddedThis</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <LangVersion>10</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>false</Optimize>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JotunnLib" Version="2.24.3" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <FULL_DEPLOY_FOLDER>$(DEPLOY_FOLDER)/BepInEx/plugins/$(AssemblyName)</FULL_DEPLOY_FOLDER>
+    <FULL_DEPLOY_FOLDER_XBOX>$(DEPLOY_FOLDER_XBOX)/BepInEx/plugins/$(AssemblyName)</FULL_DEPLOY_FOLDER_XBOX>
+    <TMP_DEPLOY_FOLDER>$(TargetDir)/tmp</TMP_DEPLOY_FOLDER>
+    <VALHEIM_MANAGED>$(VALHEIM_INSTALL)/valheim_Data/Managed</VALHEIM_MANAGED>
+  </PropertyGroup>
+
+  <Target Name="Deploy" Condition="Exists('$(DEPLOY_FOLDER)')" AfterTargets="Build">
+    <Message Text="Deploing into: $(FULL_DEPLOY_FOLDER)" Importance="high" />
+    <MakeDir Directories="$(FULL_DEPLOY_FOLDER)" />
+
+    <!--Create Thunderstore Zip-->
+    <RemoveDir Directories="$(TMP_DEPLOY_FOLDER)" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFolder="$(TMP_DEPLOY_FOLDER)" />
+    <Copy SourceFiles="$(SolutionDir)Package/icon.png" DestinationFolder="$(TMP_DEPLOY_FOLDER)" />
+    <Copy SourceFiles="$(SolutionDir)README.md" DestinationFolder="$(TMP_DEPLOY_FOLDER)" />
+    <Copy SourceFiles="$(SolutionDir)CHANGELOG.md" DestinationFolder="$(TMP_DEPLOY_FOLDER)" />
+    <Copy SourceFiles="$(SolutionDir)Package/manifest.json" DestinationFolder="$(TMP_DEPLOY_FOLDER)" />
+    <ZipDirectory SourceDirectory="$(TMP_DEPLOY_FOLDER)" DestinationFile="$(FULL_DEPLOY_FOLDER)/$(AssemblyName).zip" Overwrite="true" />
+
+    <!--Create Nexus Zip-->
+    <RemoveDir Directories="$(TMP_DEPLOY_FOLDER)" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFolder="$(TMP_DEPLOY_FOLDER)/plugins/$(AssemblyName)" />
+    <ZipDirectory SourceDirectory="$(TMP_DEPLOY_FOLDER)" DestinationFile="$(FULL_DEPLOY_FOLDER)/$(AssemblyName)-Nexus.zip" Overwrite="true" />
+
+    <!--Unpack to deploy folder-->
+    <Unzip Condition="Exists('$(DEPLOY_FOLDER)')" SourceFiles="$(FULL_DEPLOY_FOLDER)/$(AssemblyName).zip" DestinationFolder="$(FULL_DEPLOY_FOLDER)" />
+    <Unzip Condition="Exists('$(DEPLOY_FOLDER_XBOX)')" SourceFiles="$(FULL_DEPLOY_FOLDER)/$(AssemblyName).zip" DestinationFolder="$(FULL_DEPLOY_FOLDER_XBOX)" />
+  </Target>
+</Project>

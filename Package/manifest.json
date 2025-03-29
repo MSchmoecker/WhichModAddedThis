@@ -1,0 +1,10 @@
+﻿{
+  "name": "WhichModAddedThis",
+  "description": "Adds the mod name to the item tooltip and hammer build hud",
+  "version_number": "0.1.0",
+  "website_url": "https://github.com/MSchmoecker/WhichModAddedThis",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.2202",
+    "ValheimModding-Jotunn-2.24.3"
+  ]
+}
