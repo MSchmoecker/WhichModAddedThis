@@ -8,7 +8,7 @@ namespace WhichModAddedThis {
     internal class WhichModAddedThis : BaseUnityPlugin {
         public const string PluginGUID = "com.maxsch.valheim.WhichModAddedThis";
         public const string PluginName = "WhichModAddedThis";
-        public const string PluginVersion = "0.1.0";
+        public const string PluginVersion = "0.1.1";
 
         private Harmony harmony;
 
