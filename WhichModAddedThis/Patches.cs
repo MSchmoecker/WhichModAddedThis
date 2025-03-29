@@ -10,25 +10,27 @@ public static class Patches {
     [HarmonyPatch(typeof(ItemDrop.ItemData), nameof(ItemDrop.ItemData.GetTooltip), new Type[] { typeof(ItemDrop.ItemData), typeof(int), typeof(bool), typeof(float), typeof(int) })]
     [HarmonyPostfix, HarmonyPriority(Priority.Last), HarmonyAfter("randyknapp.mods.epicloot")]
     public static void AppendModName(ref string __result, ItemDrop.ItemData item) {
-        string prefabName = PrefabName(item);
-        IModPrefab modPrefab = ModQuery.GetPrefab(prefabName);
-        __result = __result.TrimEnd() + "\n" + GetTooltipModName(modPrefab);
+        if (item != null) {
+            IModPrefab modPrefab = ModQuery.GetPrefab(PrefabName(item));
+            __result = __result.TrimEnd() + "\n" + GetTooltipModName(modPrefab?.SourceMod?.Name ?? "Valheim");
+        }
     }
 
     [HarmonyPatch(typeof(Hud), nameof(Hud.SetupPieceInfo)), HarmonyPostfix]
     public static void SetupPieceInfoPatch(Hud __instance, Piece piece) {
-        IModPrefab modPrefab = ModQuery.GetPrefab(piece.name);
-        __instance.m_pieceDescription.text = __instance.m_pieceDescription.text.TrimEnd() + GetTooltipModName(modPrefab);
+        if (piece) {
+            IModPrefab modPrefab = ModQuery.GetPrefab(piece.name);
+            __instance.m_pieceDescription.text = __instance.m_pieceDescription.text.TrimEnd() + GetTooltipModName(modPrefab?.SourceMod?.Name ?? "Valheim");
+        }
     }
 
-    public static string GetTooltipModName(IModPrefab modPrefab) {
+    public static string GetTooltipModName(string modName) {
         string color = "orange";
 
         if (Chainloader.PluginInfos.ContainsKey("randyknapp.mods.epicloot")) {
             color = "#ADD8E6FF";
         }
 
-        string modName = modPrefab?.SourceMod?.Name ?? "Valheim";
         return $"\n<color={color}>{modName}</color>";
     }
 
